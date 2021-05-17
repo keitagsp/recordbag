@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+  <!-- ーーーーーーーフォントーーーーーーーーー -->
+  <link rel="stylesheet" href="https://use.typekit.net/apg1mgn.css">
+  <!-- ーーーーーーーフォントーーーーーーーーー -->
+
+  <link rel="stylesheet" href="main.css">
+  <title>chatApp</title>
+</head>
+
+<body>
+
+<div class="header">
+  <p class="title">Record bag</p>
+  <!-- 入力場所を作成しよう -->
+  <div class="search">
+    <p>
+      <i class="fas fa-search fa-lg"></i>
+      <input id="text" placeholder=" Discogs URL...">
+    </p>
+    <p>
+      <div id="send"><i class="fas fa-paper-plane fa-lg"></i>
+</div>
+    </p>
+  </div>
+</div>
+
+  <!-- データ出力場所 -->
+<div class="output">
+  <ul id="output">
+
+  </ul>
+</div>
+
+<script src="https://kit.fontawesome.com/8be5667b76.js" crossorigin="anonymous"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<!-- 以下にfirebaseのコードを貼り付けよう -->
+
+
+<script src="https://www.gstatic.com/firebasejs/8.6.1/firebase.js"></script>
+  
+  
+  <script>
+    // Your web app's Firebase configuration
+    var firebaseConfig = {
+      apiKey: ,
+      authDomain: "project-7917842538885535372.firebaseapp.com",
+      projectId: "project-7917842538885535372",
+      storageBucket: "project-7917842538885535372.appspot.com",
+      messagingSenderId: "1022232877451",
+      appId: "1:1022232877451:web:408687e75bca314f58f78e"
+    };
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+
+    const db =firebase.firestore().collection('chat08');
+  </script>
+
+
+  <script>
+    
+function convertFromFirestoreTimestampToDatetime(timestamp) {
+  const _d = timestamp ? new Date(timestamp * 1000) : new Date();
+  const Y = _d.getFullYear();
+  const m = (_d.getMonth() + 1).toString().padStart(2, '0');
+  const d = _d.getDate().toString().padStart(2, '0');
+  const H = _d.getHours().toString().padStart(2, '0');
+  const i = _d.getMinutes().toString().padStart(2, '0');
+  const s = _d.getSeconds().toString().padStart(2, '0');
+  return `${Y}/${m}/${d} ${H}:${i}:${s}`;
+}         
+      
+$('#send').on('click', function () {
+  const data = {
+    text: $('#text').val(), // textareaの入力値
+    time: firebase.firestore.FieldValue.serverTimestamp(),
+  };
+  db.add(data);
+  $('#text').val('');
+
+});
+
+db.orderBy('time','desc').onSnapshot(function(querySnapshot){
+
+const dataArray = [];
+querySnapshot.docs.forEach(function(doc){
+  const data = {
+    id: doc.id,
+    data: doc.data(),
+};
+  dataArray.push(data);
+});
+console.log(dataArray);
+
+const tagArray = [];
+  dataArray.forEach(function(data){
+    tagArray.push(`
+    <li id="${data.id}">
+      <p>${convertFromFirestoreTimestampToDatetime(data.data.time.second)}</p>
+      <p>${data.data.text}</p>
+    </li>
+    `);
+  });
+  // console.log(tagArray);
+  $('#output').html(tagArray);
+});
+  </script>
+</body>
+
+</html>

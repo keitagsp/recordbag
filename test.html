@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+    #output li {
+    background: #ccc;
+    }
+    </style>
+    <title>Document</title>
+</head>
+<body>
+
+    <ul id="output">
+    
+    </ul>
+
+    
+    
+
+
+    <script>
+
+        const requestPromise = require('request-promise');
+            const cheerio = require('cheerio');
+
+            const url = 'https://www.discogs.com/ja/Fran%C3%A7ois-K-FK-EP-The-Remixes/release/133668';
+
+            (async () => {
+                // httpリクエストを投げる
+                const response = await requestPromise({uri: url,gzip: true});
+            let $ = cheerio.load(response);
+
+            // 取得したいデータのタグを指定する
+            let title = $('hide_mobile has_action_menu').text();
+            console.log(title);
+
+            return title;
+            })();
+
+
+    </script>
+</body>
+</html>
